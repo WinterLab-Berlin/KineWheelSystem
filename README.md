@@ -31,6 +31,7 @@ Tracking is done using a Deep Neural Network trained with [DeepLabCut](https://w
         - [Inference](#inference-using-deep-neural-network)
             - [A Run Inference on a Local Machine](#a-run-inference-on-a-local-machine)
             - [B Run Inference on a Cloud Provider](#b-run-inference-on-a-cloud-provider)
+- [License](#license)
 
 ## Requirements
 
@@ -320,6 +321,8 @@ python inference.py -c /path/to/dlc/config.yaml label -v /path/to/video_file.mp4
 
 > **TODO** E.g., Google Colab
 
-## TODOs and Questions
+## License
 
-See OneNote.
+This project is licensed under the GNU Lesser General Public License v3.0.
+Note that the software is provided "as is", without warranty of any kind, express or implied.
+If you use the code or data, please cite us!
