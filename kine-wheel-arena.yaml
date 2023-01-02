@@ -1,0 +1,15 @@
+# Kine Wheel Arena - DLC conda environment
+# create: conda env create -f kine-wheel-arena.yaml
+# update: conda env update -f kine-wheel-arena.yaml
+name: kwa
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.8  # KWA tested with Python 3.8
+  - pip
+  - jupyter  # Use Jupyter Notebooks
+  - nb_conda
+  - ffmpeg
+  - pip:
+    - "deeplabcut[gui]==2.2.2"
