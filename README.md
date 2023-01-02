@@ -27,7 +27,7 @@ Tracking is done using a Deep Neural Network trained with [DeepLabCut](https://w
     - [Workflow](#workflow)
     - [I Record video](#i-record-video)
     - [II Analyze video](#ii-analyze-and-label-videos)
-        - [Prepare DLC Environment for Inference](#prepare-dlc-environment-for-inference)
+        - [Create DLC Project for Inference](#create-dlc-project-for-inference)
         - [Inference](#inference-using-deep-neural-network)
             - [A Run Inference on a Local Machine](#a-run-inference-on-a-local-machine)
             - [B Run Inference on a Cloud Provider](#b-run-inference-on-a-cloud-provider)
@@ -58,11 +58,10 @@ For running the system, a Windows machine with the following software installed 
 
 #### KWA-Controller App
 
-> **TODO**: Are any SDKs necessary to run the program (.NET, etc.)? If so, list them as requirements.
-
 The *KWA-Controller* app is a small Windows application with a graphical user interface, which allows the user to control the lighting and the camera's rate at which it is capturing images.
 It is required to get the system ready to record videos using [pylon Viewer](#pylon-viewer).
-The application requires no installation and is available in this repository as `Inference/Arduino/KWA-Controller.exe`.
+The application requires no installation but needs [Microsoft .NET Framework 4.8 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48).
+A compiled version of the program for Windows 64-bit OS is available for download on the GitHub Releases page.
 
 ![Graphical user interface of KWA-Controller](./Docs/Media/KWA-Controller-App-1.png)
 
@@ -92,8 +91,6 @@ Then, open `KWA-Controller.exe`, click on the *Port* drop-down menu, and select 
 The *FPS* (Frames Per Second) value, which sets the rate at which the camera is triggered to capture a frame, can be set to a value between 1–720, using the edit box or track bar.
 Note that higher values result in a larger video file size due to the higher rate at which frames are captured.
 
-> **TODO**: Verify what a reasonable FPS value for inference recordings is. (also note the approx. file size for one min. of video and state it as an example)
-
 Click on *Connect* to establish communication with the Arduino. If no errors icons appear next to the form fields and the button text changes to "Disconnect", lighting and camera trigger can now be switched on/off using the button *Turn lights/cam on*; otherwise, move the mouse pointer over the error icon and read the error message, which should also provide a suggestion on how to fix the error.
 
 ![KWA-Controller app communicating over COM4](./Docs/Media/KWA-Controller-App-On-Port-COM4-At-60-FPS.png)
@@ -106,7 +103,7 @@ Click on *Connect* to establish communication with the Arduino. If no errors ico
 
 Download and install the software suit from the official Basler Website: [pylon Viewer](https://www.baslerweb.com/en/downloads/software-downloads/#type=pylonsoftware;language=all;version=7.2.1)
 
-To record video in MPEG-4 file format, download and install the supplementary package for MPEG-4 from Basler's Website: [pylon Supplementary Package for MPEG-4 Windows](https://www.baslerweb.com/en/downloads/software-downloads/#type=pylonsupplementarypackageformpeg4;language=all;version=all;os=windows)
+To record video in MPEG-4 file format (recommended), download and install the supplementary package for MPEG-4 from Basler's Website: [pylon Supplementary Package for MPEG-4 Windows](https://www.baslerweb.com/en/downloads/software-downloads/#type=pylonsupplementarypackageformpeg4;language=all;version=all;os=windows)
 
 Note: The rest of this documentation assumes that the package has been installed.
 
@@ -165,42 +162,56 @@ For more details, refer to the [pylon Viewer documentation on recording](https:/
 
 #### Anaconda/Miniconda
 
-> **TODO** (Maybe not needed, as download page linked above.)
+[Download](https://conda.io/projects/conda/en/stable/user-guide/install/download.html) and install Anaconda or Miniconda for Windows from conda.io.
+The difference between both versions is explained on the download page; both work with this guide.
 
 ## Repository Contents
 
-> **TODO** Tree view of folders/files (of importance) with short description.
-
 ```txt
-Arduino
-Camera
-Docs
-Inference
-...
+|   kine-wheel-arena.yml
+├───Arduino
+|   ├───cam_and_light_sync
+│   └───KWA-Controller
+├───Camera
+|       acA720-520uc-inference.pfs
+├───DLC-Skeleton
+│   ├───dlc-models
+│   ├───evaluation-results
+│   ├───labeled-data
+│   ├───training-datasets
+│   └───videos
+├───Docs
+└───Inference
+        inference.ipynb
+        inference.py
 ```
 
 ## Installation
 
 Steps described in this section only need to be done once.
+This guide assumes that [Anacond/Miniconda](#anacondaminiconda) is used to manage Python and its packages.
 
-Python (version) fixed in `kine-wheel-arena.yml`.
+First, clone the [KineWheelSystem repository](https://github.com/WinterLab-Berlin/KineWheelSystem) from GitHub.
+Alternatively, GitHub offers a [link](https://github.com/WinterLab-Berlin/KineWheelSystem/archive/refs/heads/main.zip) to download the repository as a ZIP file.
 
-> **TODO** Create and add `kine-wheel-arena.yaml` to Git repository.
+In the example below, the repository is cloned to `C:/Data/KineWheelSystem`.
+You can choose any valid path; however, the destination folder (here: `KineWheelSystem`) must not exist or be empty.
 
-Create a Conda (virtual Python) environment by running the following command:
+```console
+git clone https://github.com/WinterLab-Berlin/KineWheelSystem.git C:\Data\KineWheelSystem
+```
+
+[Open a conda prompt](https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html#starting-conda) (type *anaconda* or *miniconda* into the Windows search bar, depending on which version has been installed) and navigate to the repository root folder `KineWheelSystem`.
+
+```console
+cd C:\Data\KineWheelSystem
+```
+
+Create a conda (virtual Python) environment with all the required packages by running the following command:
 
 ```console
 conda env create -f kine-wheel-arena.yml
 ```
-
-Activate the Conda environment by running:
-
-```console
-conda activate kwa
-```
-
-> **TODO** Continue
-
 
 ## Usage
 
@@ -229,12 +240,45 @@ Each recording session requires the following steps to be performed to record vi
 
 ### (II) Analyze and Label Videos
 
-#### Prepare DLC Environment for Inference
+The following sections explain how to use the trained deep neural network to predict paw locations in recorded video.
+The predictions are stored as CSV and HDF5 files.
+They can optionally be used to label the analyzed video (i.e., plot the network's predictions for each frame) or in any other software which supports DLC's prediction output format.
+For details, see the section on [inference results](#inference-results).
 
-> **TODO**: Explain what to do
-> * Copy DLC project structure from this repo `DLC-Project/`
-> * Download pre-trained NN (from where?) and place it in the correct folder within the copied DLC project
-> * 
+#### Create DLC Project for Inference
+
+To run inference, a DLC project must be created and the weights of the trained neural network must be downloaded.
+
+This repository comes with a pre-configured DLC project, located in `DLC-Skeleton`.
+Copy the entire folder to a location of your choosing, e.g., `C:\Data\DLC-Skeleton`.
+
+[Download](https://github.com/WinterLab-Berlin/KineWheelSystem/releases) the network weights and save them to `DLC-Skeleton\dlc-models\iteration-2\sa-GA-Basler-acA720-520ucAug23-trainset67shuffle1\train`.
+
+The resulting folder structure of the project should look like this:
+
+```txt
+DLC-Skeleton
+    │   config.yaml
+    │
+    └──dlc-models
+        └─iteration-2
+            └─sa-GA-Basler-acA720-520ucAug23-trainset67shuffle1
+                └─train
+                     pose_cfg.yaml
+                     snapshot-102500.data-00000-of-00001
+                     snapshot-102500.index
+                     snapshot-102500.meta
+```
+
+Finally, the DLC project configuration, stored in `DLC-Skeleton\config.yaml` must be modified to match your environment.
+Open `DLC-Skeleton\config.yaml` with a text editor (e.g., Notepad) and set `project_path` to the absolute path to the `DLC-Skeleton` folder you have copied above, e.g., `C:\Data\DLC-Skeleton`.
+
+*File:* `config.yaml`
+
+```yaml
+# Project path (change when moving around)
+project_path: C:\Data\DLC-Skeleton
+```
 
 #### Inference using Deep Neural Network
 
@@ -244,34 +288,28 @@ Open an *Anaconda Prompt* (press Windows key and search for Anaconda Prompt) and
 conda activate kwa
 ```
 
-> **TODO** Does `notebook` package have to be installed in addition to packages in
-Conda yml file?
-
 To infer the location of paws in recorded video, either
 
 <ol style="list-style-type: upper-alpha">
-    <li><i>use your local machine</i> – run the Python command-line script <code>inference_local.py</code> or start the Jupyter Notebook <code>inference_local.ipynb</code>; or</li>
-    <li><i>use a cloud provider</i> – upload <code>inference_cloud.ipynb</code> to a cloud provider hosting Jupyter Notebooks, for instance, Google Colab or Paperspace, and run it on their machines.</li>
+    <li><i>use your local machine</i> – run the Python command-line script <code>inference.py</code>; or</li>
+    <li><i>use a cloud provider</i> – upload <code>inference.ipynb</code> to a cloud provider hosting Jupyter Notebooks, for instance, Google Colab or Paperspace, and run it on their machines.</li>
 </ol>
-
-> **TODO**: Add note about running inference locally (run time, required resources).
 
 ##### (A) Run Inference on a Local Machine
 
-For convenience, this repository provides a Python command-line script `inference_local.py` and a Jupyter Notebook `inference_local.ipynb` to run inference on a local machine.
+For convenience, this repository provides a Python command-line script `inference.py` and a Jupyter Notebook `inference.ipynb` to run inference on a local machine.
 The script as well as the notebook just provide wrapper code which internally uses DLC's `deeplabcut.analyze_videos()` and `deeplabcut.create_labeled_video()` functions.
 If you want to have more fine-grained control over both functions, you can write your own scripts.
 Refer to the DeepLabCut documentation sections [Novel Video Analysis](https://deeplabcut.github.io/DeepLabCut/docs/standardDeepLabCut_UserGuide.html#i-novel-video-analysis) and [Create Labeled Videos](https://deeplabcut.github.io/DeepLabCut/docs/standardDeepLabCut_UserGuide.html#l-create-labeled-videos).
 
-The command-line script `inference_local.py` can perform two operations:
+The command-line script `inference.py` can perform two operations:
 
 1) *predict* mouse paw locations in a video using a deep neural network and
 1) *label* a video for visualization purposes, based on its prediction results.
 
 Prediction results are stored as HDF5 and CSV file in the same folder where
 the corresponding video resides. The `label` operation requires the prediction
-results (specifically, the HDF5 file) to be present in the folder of the video
-to label.
+results (specifically, the HDF5 file) to be present in the parent folder of the video to label.
 
 The script requires as input a single operation and 
 
@@ -306,7 +344,6 @@ python inference.py -c /path/to/dlc/config.yaml predict -v /path/to/video_folder
 *Example 3: Video Labelling*
 
 Label the paw locations in `video_file.mp4` as predicted by the neural network.
-The `--hq` flag creates the video in high-quality.
 This call assumes that the prediction results for `video_file.mp4` are stored in
 the same folder where the video resides. The labeled video will be saved to this
 folder as well.
@@ -315,11 +352,28 @@ folder as well.
 python inference.py -c /path/to/dlc/config.yaml label -v /path/to/video_file.mp4
 ```
 
-> **TODO**: Show sample output files (and content and their locations)
+#### Inference Results
+
+Inference results are stored as CSV and HDF5 files. Table 1 shows an extract of such a CSV file.
+
+| bodyparts | MIRROR_VIEW-GREEN | MIRROR_VIEW-GREEN | MIRROR_VIEW-GREEN | ... | SIDE_PROFILE_VIEW-AQUA | SIDE_PROFILE_VIEW-AQUA | SIDE_PROFILE_VIEW-AQUA |
+| -------- | ---------------- | ---------------- | ---------------- | -- | --------------------- | --------------------- | --------------------- |
+| coords    | x               | y        | likelihood | ... | x        | y        | likelihood |
+| |
+| 0         | 475.0961609     | 238.942  | 0.025769   | ... | 473.7445 | 241.1117 | 0.419408   |
+| ...       | ...             | ...      | ...        | ... | ...      | ...      | ...        |
+| 9827      | 326.961853      | 215.4589 | 0.872176   | ... | 471.9395 | 242.7794 | 0.998214   |
+
+*Table 1 – Sample contents of the CSV/HDF5 file generated during inference of a video with 9827 frames.*
+*The first two rows are header rows: row one defines label names, each duplicated for one coordinate/likelihood-triple in row two.*
+*All remaining rows correspond to exactly one frame in the analyzed video, their respective frame index given in the first column.*
+*For each frame and body part, x-/y-coordinates (in # of pixels) and the network's assigned probability of the particular body part being present at these coordinates are given.*
 
 ##### (B) Run Inference on a Cloud Provider
 
-> **TODO** E.g., Google Colab
+Upload the Jupyter Notebook `Inference\inference.ipynb` to Google Colab and follow the instructions inside the notebook.
+
+> **TODO** E.g., try out instructions on Google Colab
 
 ## License
 
