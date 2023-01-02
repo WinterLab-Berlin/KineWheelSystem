@@ -1,0 +1,60 @@
+
+    # Project definitions (do not edit)
+Task: sa-GA-Basler-acA720-520uc
+scorer: Auto-Labeler
+date: Aug23
+multianimalproject: false
+identity:
+
+    # Project path (change when moving around)
+project_path: C:\Data\DLC-Skeleton
+
+video_sets:
+
+bodyparts:
+- MIRROR_VIEW-GREEN
+- MIRROR_VIEW-RED
+- MIRROR_VIEW-BLUE
+- MIRROR_VIEW-AQUA
+- SIDE_PROFILE_VIEW-GREEN
+- SIDE_PROFILE_VIEW-RED
+- SIDE_PROFILE_VIEW-BLUE
+- SIDE_PROFILE_VIEW-AQUA
+
+    # Fraction of video to start/stop when extracting frames for labeling/refinement
+start: 0
+stop: 1
+numframes2pick: 150
+
+    # Plotting configuration
+skeleton:
+skeleton_color: black
+pcutoff: 0.6  # Only plot predictions above or equal to certainty threshold
+
+  # Adjust values to customize labels in labeled videos.
+dotsize: 6   # Size of plotted labels
+alphavalue: 0.7  # Opacity of plotted labels
+colormap: rainbow
+
+    # Training,Evaluation and Analysis configuration
+TrainingFraction:
+- 0.67
+iteration: 2
+default_net_type: resnet_50
+default_augmenter: default
+snapshotindex: -1  # -1: only last snapshot, all: all snapshots
+batch_size: 8
+
+    # Cropping Parameters (for analysis and outlier frame detection)
+cropping: false
+    #if cropping is true for analysis, then set the values here:
+x1: 0
+x2: 640
+y1: 277
+y2: 624
+
+    # Refinement configuration (parameters from annotation dataset configuration also relevant in this stage)
+corner2move2:
+- 50
+- 50
+move2corner: true
