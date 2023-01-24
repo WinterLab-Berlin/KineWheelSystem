@@ -1,7 +1,7 @@
 # Repository Contents
 
 ```
-|   kine-wheel-arena.yml
+|   kine-wheel-arena.yaml
 ├───Arduino
 |   ├───cam_and_light_sync
 │   └───KWA-Controller
@@ -43,5 +43,5 @@ cd C:\Data\KineWheelSystem
 Create a conda (virtual Python) environment with all the required packages by running the following command:
 
 ```console
-conda env create -f kine-wheel-arena.yml
+conda env create -f kine-wheel-arena.yaml
 ```
