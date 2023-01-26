@@ -29,3 +29,7 @@ ol.my-ol {
 .my-ol>li {
     list-style: revert;
 }
+
+p {
+    margin: revert;
+}
