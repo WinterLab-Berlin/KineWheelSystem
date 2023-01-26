@@ -12,4 +12,4 @@ dependencies:
   - nb_conda
   - ffmpeg
   - pip:
-    - "deeplabcut[gui]==2.2.2"
+    - "deeplabcut[gui,tf]==2.2.2"
