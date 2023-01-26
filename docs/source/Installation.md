@@ -34,7 +34,7 @@ You can choose any valid path; however, the destination folder (here: `KineWheel
 git clone https://github.com/WinterLab-Berlin/KineWheelSystem.git C:\Data\KineWheelSystem
 ```
 
-[Open a conda prompt](https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html#starting-conda) (type *anaconda* or *miniconda* into the Windows search bar, depending on which version has been installed) and navigate to the repository root folder `KineWheelSystem`.
+[Open a Anaconda prompt](https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html#starting-conda) (type *anaconda* into the Windows search box) and navigate to the repository root folder `KineWheelSystem`.
 
 ```console
 cd C:\Data\KineWheelSystem
@@ -44,4 +44,16 @@ Create a conda (virtual Python) environment with all the required packages by ru
 
 ```console
 conda env create -f kine-wheel-arena.yaml
+```
+
+Whenever opening a new Anaconda prompt, usage of the new environment requires activation, running the command below:
+
+```console
+conda activate kwa
+```
+
+The environment can be deactivated by running:
+
+```console
+conda deactivate
 ```

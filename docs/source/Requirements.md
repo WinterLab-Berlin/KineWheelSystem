@@ -3,13 +3,25 @@
 ## Hardware
 
 *Kine Wheel Arena – DLC* (KWA-DLC) consists of a mouse wheel, camera, lighting, a control unit (Arduino) to synchronize camera and lighting, and a surrounding box which shields the system from interference of external light sources.
-Furthermore, the complimentary [software](#software) to operate the system requires a Windows machine.
 
 > **TODO**: Replace with photo of final setup.
 
 ![Experimental Setup - Camera View](./media/Experimental-Setup-Camera-View.png)
 
 *Figure 2 – Photo of the experimental setup from the view of the camera.*
+
+Furthermore, the complimentary [software](#software) to operate the system requires a modern, mid-range Windows 10/11 machine (build year 2018 and up).
+For instance, the labeled video shown in [Figure 1](index.rst) was recorded and subsequently labeled on a machine with the following specifications:
+
+- CPU: Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz
+- RAM: 16 GiB
+- Storage space: 100+ GiB SSD
+    - *Note:* A one-minute video recording takes up approximately 350 MiB of storage space.
+- GPU: none
+- Light/camera controller: Arduino Nano Rev. 3.0
+- Camera: [Basler acA720-520uc (USB 3.0, color)](https://www.baslerweb.com/en/products/cameras/area-scan-cameras/ace/aca720-520uc)
+    - Data cable: [Basler USB 3.0 with type A plug to Micro-B plug](https://docs.baslerweb.com/basler-cable-usb3-microb-sl-a-p.html) (connects camera to computer to power camera and capture images)
+    - I/O cable: [Basler Power-I/O Cable, HRS 6p/open, S, 5 m](https://www.baslerweb.com/en/products/cable/basler-power-i-o-cable-hrs-6p-open-s-5-m) (connects camera to Arduino to trigger the camera shutter)
 
 ## Software
 
@@ -95,14 +107,14 @@ To edit the recording settings, ensure that the camera device is opened and no r
 - Set the *Output Format* to *MP4* to record video in MPEG-4 file format.
 - Tick the checkbox *Set Fixed Playback Speed* and set the *FPS* value to the same value set in the KWA-Controller app. This ensures that the playback of the video reflects real time and is not slowed down (FPS pylon Viewer > FPS KWA-Controller) or sped up (FPS pylon Viewer < FPS KWA-Controller). However, a mismatch between both FPS values won't affect the predictions made by the neural network during inference.
 - Move the *Quality* slider to the far right position to record videos in the highest quality (lowest compression, but larger file size). Lowering the quality value can ease the system load and help with recording buffer overruns (dropped frames) on slower machines, but might lower the prediction accuracy during inference.
-- Set the *Recording Buffer Size* to *5,000*. Should you encounter dropped frames during recording (see status bar of Preview pane), increase the value.
+- Set the *Recording Buffer Size* to *50,000*. Should you encounter dropped frames during recording (see status bar of Preview pane), increase the value.
 - Set *Record A Frame Every* to *1 Frame(s)*. Each frame captured by the camera will be written to video when recording.
 
 For more details, refer to the [pylon Viewer documentation on recording](https://docs.baslerweb.com/recording).
 
 ![Recording Settings pane in pylon Viewer](./media/pylon-Viewer-Recording-Settings.png)
 
-*Figure 4b – The image shows the Recording Settings pane in pylon Viewer. The recording to video option is selected. Videos will be recorded in highest quality in MPEG-4 file format with a fixed playback speed of 720 FPS. They will be saved to `C:\Users\KWA\Videos`. Every frame captured by the camera will be written to video. The recording buffer is set to hold 5,000 frames.*
+*Figure 4b – The image shows the Recording Settings pane in pylon Viewer. The recording to video option is selected. Videos will be recorded in highest quality in MPEG-4 file format with a fixed playback speed of 720 FPS. They will be saved to `C:\Users\KWA\Videos`. Every frame captured by the camera will be written to video. The recording buffer is set to hold 50,000 frames.*
 
 #### Record
 
