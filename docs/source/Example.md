@@ -1,7 +1,7 @@
 # Example
 
 The following example shows how to use the pre-trained neural network on an unlabeled sample video.
-To follow along, ensure that you have read the (Installation.md#installation)[Installation] section and set up the required environment.
+To follow along, ensure that you have read the [Installation](Installation.md#installation) section and set up the required environment.
 
 First, download the sample video `2022-08-19T14-07-11--Basler acA720-520uc-x264.mp4` (68 MiB) from [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7586688.svg)](https://doi.org/10.5281/zenodo.7586688).
 
