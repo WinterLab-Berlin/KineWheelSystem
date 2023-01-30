@@ -25,4 +25,5 @@ The system is available for purchase at `LABmaker <https://www.labmaker.org>`_.
    Requirements
    Installation
    Usage
+   Example
    License
